@@ -2,6 +2,7 @@ package HeaderServer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -18,8 +19,9 @@ public class GetHeaderServerHandler extends SimpleChannelHandler{
 	@Override
 	public void messageReceived(
 			ChannelHandlerContext ctx, MessageEvent e) {
-		ChannelFuture f = e.getChannel().write(e.getMessage()); // Print to Browser
-		System.out.println(e.getMessage()); // Print Channel Buffer
+		ChannelBuffer buf = (ChannelBuffer) e.getMessage();
+		ChannelFuture f = e.getChannel().write(buf); // Print to Browser
+		System.out.println(buf.toString()); // Print Channel Buffer
 		f.addListener(ChannelFutureListener.CLOSE);
 	}
 	
