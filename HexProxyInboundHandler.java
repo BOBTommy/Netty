@@ -123,16 +123,16 @@ public class HexProxyInboundHandler extends SimpleChannelUpstreamHandler{
 			//Message 조작
 			BigEndianHeapChannelBuffer buf = (BigEndianHeapChannelBuffer) e.getMessage();
 			File file = new File("c:/test.txt");
-			try {
-				FileWriter fw = new FileWriter(file);
-				fw.write(buf.toString(Charset.defaultCharset()));
-				fw.flush();
-				fw.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			String strTmp = buf.toString(Charset.defaultCharset());
+			strTmp.replaceAll("사이트 관리자에게 연락하기", "BOBTommy에게 연락하기");
+			ChannelBuffer tmp = ChannelBuffers.copiedBuffer(strTmp.getBytes());
+			System.out.println(tmp.toString(Charset.defaultCharset()));
+				//FileWriter fw = new FileWriter(file);
+				//fw.write(buf.toString(Charset.defaultCharset()));
+				//fw.flush();
+				//fw.close();
 			
+			//System.out.println(buf.toString(Charset.defaultCharset()));
 			
 			/*
 			HttpRequest req = (HttpRequest) e.getMessage();
@@ -141,7 +141,7 @@ public class HexProxyInboundHandler extends SimpleChannelUpstreamHandler{
 			System.out.println(content.toString(Charset.defaultCharset()));
 			*/
 			synchronized (trafficLock){
-				inboundChannel.write(msg);
+				inboundChannel.write(tmp);
 				if(!inboundChannel.isWritable()){
 					e.getChannel().setReadable(false);
 				}
