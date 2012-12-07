@@ -1,8 +1,13 @@
 package ProxyServer;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.buffer.BigEndianHeapChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -102,6 +107,9 @@ public class HexProxyInboundHandler extends SimpleChannelUpstreamHandler{
 		}
 	}
 	
+	
+	//Big OutBound Channel Handler
+	
 	private class OutboundHandler extends SimpleChannelUpstreamHandler{
 		private final Channel inboundChannel;
 		
@@ -112,6 +120,26 @@ public class HexProxyInboundHandler extends SimpleChannelUpstreamHandler{
 		@Override
 		public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e){
 			ChannelBuffer msg = (ChannelBuffer) e.getMessage();
+			//Message 조작
+			BigEndianHeapChannelBuffer buf = (BigEndianHeapChannelBuffer) e.getMessage();
+			File file = new File("c:/test.txt");
+			try {
+				FileWriter fw = new FileWriter(file);
+				fw.write(buf.toString(Charset.defaultCharset()));
+				fw.flush();
+				fw.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+			/*
+			HttpRequest req = (HttpRequest) e.getMessage();
+			ChannelBuffer content = req.getContent();
+			System.out.println(req.getUri());
+			System.out.println(content.toString(Charset.defaultCharset()));
+			*/
 			synchronized (trafficLock){
 				inboundChannel.write(msg);
 				if(!inboundChannel.isWritable()){
